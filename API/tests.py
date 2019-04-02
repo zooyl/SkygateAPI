@@ -1,15 +1,23 @@
 from django.test import TestCase
 from .models import Exam, Task
+from django.contrib.auth.models import User
 
 
 class TaskCreationTest(TestCase):
+    """ Model Tests """
 
     @classmethod
     def setUpTestData(cls):
-        Exam.objects.create(name='test_name')
+        User.objects.create(username='test_user')
+        Exam.objects.create(user_id=1, name='test_name')
         Task.objects.create(task="Simple task to do:", points=0, exam_id=1)
         Task.objects.create(task="Another task with numbers to complete", points=5, exam_id=1)
         Task.objects.create(task="test_task", points=30, exam_id=1)
+
+    def test_user_creation(self):
+        test_user = User.objects.get(id=1)
+        self.assertIsInstance(test_user, User)
+        self.assertEqual(test_user.username, 'test_user')
 
     def test_task_creation(self):
         test_task = Task.objects.get(id=1)

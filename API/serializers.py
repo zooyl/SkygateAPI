@@ -18,6 +18,9 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ExamSerializer(serializers.HyperlinkedModelSerializer):
+    """ It sets user_id to actually logged user """
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Exam
         fields = '__all__'

@@ -17,5 +17,5 @@ class TaskViewSet(viewsets.ModelViewSet):
 
 
 class ExamViewSet(viewsets.ModelViewSet):
-    queryset = Exam.objects.all()
+    queryset = Exam.objects.all().order_by('-grade')
     serializer_class = ExamSerializer
