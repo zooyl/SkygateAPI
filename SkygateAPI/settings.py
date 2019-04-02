@@ -122,3 +122,12 @@ except ModuleNotFoundError:
     print("There is no database configuration in local_settings.py")
     print("Fill fields correctly and try again")
     exit(0)
+
+# REST configuration
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
