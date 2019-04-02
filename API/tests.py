@@ -1,6 +1,7 @@
 from django.test import TestCase
 from .models import Exam
 
+
 # Create your tests here.
 
 class ExamCreationTest(TestCase):
