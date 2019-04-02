@@ -19,6 +19,7 @@ from rest_framework import routers
 import API.views
 
 router = routers.DefaultRouter()
+router.register('task', API.views.TaskViewSet)
 router.register('exam', API.views.ExamViewSet)
 
 urlpatterns = [
