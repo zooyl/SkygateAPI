@@ -24,7 +24,7 @@ SECRET_KEY = '_o!6vq3o-sqqf9!y_%d==8(43wg0o9y*i5(y=5e2#vz@cjvaww'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
@@ -72,13 +72,25 @@ WSGI_APPLICATION = 'SkygateAPI.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# DOCKER DB
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'HOST': 'db',
+#         'PORT': 5432,
+#     }
+# }
+
+# LOCAL DB
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'skygateapi',
         'USER': 'postgres',
-        'HOST': 'db',
-        'PORT': 5432,
+        'PASSWORD': 'coderslab',
+        'HOST': 'localhost'
     }
 }
 

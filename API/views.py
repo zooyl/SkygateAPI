@@ -13,5 +13,5 @@ class TaskViewSet(viewsets.ModelViewSet):
 
 class ExamViewSet(viewsets.ModelViewSet):
     permission_classes = (ExamPermission, IsAuthenticated)
-    queryset = Exam.objects.all().order_by('-grade')
+    queryset = Exam.objects.all().order_by('user', '-grade')
     serializer_class = ExamSerializer
