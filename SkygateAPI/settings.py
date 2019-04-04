@@ -71,6 +71,9 @@ WSGI_APPLICATION = 'SkygateAPI.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# --------------------------------------------------------------------------------------
+# To change between Docker/local Database, just comment one, that you do not wanna use
+# --------------------------------------------------------------------------------------
 # DOCKER DB
 # DATABASES = {
 #     'default': {
@@ -85,6 +88,7 @@ WSGI_APPLICATION = 'SkygateAPI.wsgi.application'
 # LOCAL DB
 from .local_settings import DATABASES
 
+# --------------------------------------------------------------------------------------
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
