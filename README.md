@@ -13,7 +13,8 @@ of a file.
 ### Docker installation
 
 In ```settings.py``` file (lines from 70 to 90), change database for ```DOCKER DB```.  
-Now you are ready to go and able to run ```docker-compose up --build```
+Now you are ready to go and able to run ```docker-compose up --build```  
+Side note: In this case you need to create super user by running ```docker-compose run web python manage.py createsuperuser``` and after that, start server again with ```docker-compose up```.
 
 ### Manual installation
 Create virtual environment on your machine, then install requirements using:
