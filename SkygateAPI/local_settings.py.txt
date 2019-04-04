@@ -2,7 +2,7 @@
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 
-# change database name, user and password for your database, then change file name to local_settings.py
+# change database name, user and password for your local database, then change file name to local_settings.py
 
 DATABASES = {
     'default': {
