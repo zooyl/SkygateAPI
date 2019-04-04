@@ -24,6 +24,9 @@ Open terminal in ```manage.py``` directory and type ```python manage.py migrate`
 After that, fill database using ```python manage.py loaddata task-exam.json``` .
 Run tests ```python manage.py test``` and finally start server by ```python manage.py runserver``` command.
 
+## Chapter II Exercises
+Python files are included in ```ChapterII``` folder
+
 ## Built With
 
 * [Django](https://www.djangoproject.com/) - The web framework used
