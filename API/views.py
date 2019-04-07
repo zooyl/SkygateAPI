@@ -2,9 +2,9 @@
 import API.serializers
 import API.models
 import API.permissions
-import API.filters
 
 # Rest imports
+from rest_framework import filters
 import rest_framework.permissions
 from rest_framework import viewsets
 
@@ -13,7 +13,9 @@ class TaskViewSet(viewsets.ModelViewSet):
     permission_classes = (API.permissions.TaskPermission,
                           rest_framework.permissions.IsAdminUser)
     serializer_class = API.serializers.TaskSerializer
-    filterset_class = API.filters.TaskFilter
+    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    search_fields = ('title', 'task', 'points')
+    ordering_fields = ('title', 'task', 'points')
 
     def get_queryset(self):
         user = self.request.user
@@ -24,7 +26,9 @@ class ExamViewSet(viewsets.ModelViewSet):
     permission_classes = (API.permissions.ExamPermission,
                           rest_framework.permissions.IsAdminUser)
     serializer_class = API.serializers.ExamSerializer
-    filterset_class = API.filters.ExamFilter
+    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    search_fields = ('name', 'grade', 'comments')
+    ordering_fields = ('name', 'grade', 'comments')
 
     def get_queryset(self):
         user = self.request.user
@@ -34,7 +38,9 @@ class ExamViewSet(viewsets.ModelViewSet):
 class AnswersViewSet(viewsets.ModelViewSet):
     serializer_class = API.serializers.AnswersSerializer
     queryset = API.models.Answers.objects.all()
-    filterset_class = API.filters.AnswersFilter
+    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    search_fields = '__all__'
+    ordering_fields = '__all__'
 
     def get_queryset(self):
         user = self.request.user
