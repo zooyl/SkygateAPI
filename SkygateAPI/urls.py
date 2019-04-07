@@ -21,6 +21,7 @@ import API.views
 router = routers.DefaultRouter()
 router.register('task', API.views.TaskViewSet, base_name='task')
 router.register('exam', API.views.ExamViewSet, base_name='exam')
+router.register('answers', API.views.AnswersViewSet, base_name='answers')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -1,41 +1,15 @@
+# API imports
 from django.test import TestCase
-from .models import Exam, Task
+import API.models
 from django.contrib.auth.models import User
+
+# Rest imports
 from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
 
 # API Client
 
 client = APIClient()
-
-
-class ModelTest(TestCase):
-    """ Model Tests """
-    fixtures = ['task-exam.json']
-
-    def test_user(self):
-        test_user = User.objects.get(id=1)
-        self.assertIsInstance(test_user, User)
-        self.assertEqual(test_user.username, 'super-user')
-
-    def test_task(self):
-        test_task = Task.objects.get(id=1)
-        test_task2 = Task.objects.get(id=2)
-        test_task3 = Task.objects.get(id=3)
-        self.assertEqual(test_task.task, 'SuperUserTask1')
-        self.assertIsInstance(test_task, Task)
-        self.assertEqual(test_task2.points, 40)
-        self.assertIsInstance(test_task2, Task)
-        self.assertEqual(test_task3.exam_id, 2)
-        self.assertIsInstance(test_task3, Task)
-
-    def test_exam(self):
-        test_exam = Exam.objects.get(id=1)
-        test_exam2 = Exam.objects.get(id=2)
-        self.assertIsInstance(test_exam, Exam)
-        self.assertIsInstance(test_exam2, Exam)
-        self.assertEqual(test_exam.name, 'SuperUserExam1')
-        self.assertEqual(test_exam2.name, 'SuperUserExam2')
 
 
 class ForbiddenTest(APITestCase):
