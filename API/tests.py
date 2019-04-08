@@ -30,6 +30,10 @@ class ForbiddenTest(APITestCase):
         response = self.client.get("http://127.0.0.1:8000/task/1", follow=True)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_answers_example_forbidden(self):
+        response = self.client.get("http://127.0.0.1:8000/answers/1", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class ConnectionTest(APITestCase):
     """ Tests to check if user is logged in """
@@ -129,7 +133,7 @@ class ExamAPIViewTestCase(APITestCase):
         post = {
             'user': self.client,
             'name': '',
-            'grade': 'too_many',
+            'grade': 'F',
             'comments': 'good job'
         }
         response = self.client.post("http://127.0.0.1:8000/exam/", post)
@@ -140,7 +144,7 @@ class ExamAPIViewTestCase(APITestCase):
         post = {
             'user': self.client,
             'name': 'that_name_is_too_long_for_this_field',
-            'grade': 'too_many',
+            'grade': '5',
             'comments': 'good job'
         }
         response = self.client.post("http://127.0.0.1:8000/exam/", post)
@@ -151,18 +155,20 @@ class ExamAPIViewTestCase(APITestCase):
         post = {
             'user': self.client,
             'name': 'test_name',
-            'grade': 'too_many',
+            'grade': 'C',
             'comments': 'that_comment_is_too_long_for_this_field' * 15
         }
         response = self.client.post("http://127.0.0.1:8000/exam/", post)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['comments'], ["Ensure this field has no more than 128 characters."])
 
-    # I don't know why it's not working properly
+    # I don't know why put and delete is not working properly (in every case)
     #
     # def test_exam_put(self):
     #     put = {
     #         'name': 'put_test_name',
+    #         'grade': 'B+',
+    #         'comments': 'put_test_comment'
     #     }
     #     response = self.client.put("http://127.0.0.1:8000/exam/1", put, follow=True)
     #     self.assertEqual(response.data['name'], 'put_test_name')
@@ -190,7 +196,7 @@ class TaskAPIViewTestCase(APITestCase):
             'task': 'test_task',
             'exam': 1
         }
-        response = self.client.post("http://127.0.0.1:8000/task/", post, follow=True)
+        response = self.client.post("http://127.0.0.1:8000/task/", post)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['title'], 'test_title')
 
@@ -201,10 +207,9 @@ class TaskAPIViewTestCase(APITestCase):
             'task': 'test_task',
             'exam': 1
         }
-        response = self.client.post("http://127.0.0.1:8000/task/", post, follow=True)
+        response = self.client.post("http://127.0.0.1:8000/task/", post)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['points'], ["Ensure this value is less than or equal to 100."])
-
 
     def test_task_post_points_invalid_under_0(self):
         post = {
@@ -213,7 +218,7 @@ class TaskAPIViewTestCase(APITestCase):
             'task': 'test_task',
             'exam': 1
         }
-        response = self.client.post("http://127.0.0.1:8000/task/", post, follow=True)
+        response = self.client.post("http://127.0.0.1:8000/task/", post)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['points'], ["Ensure this value is greater than or equal to 0."])
 
@@ -227,7 +232,6 @@ class TaskAPIViewTestCase(APITestCase):
         response = self.client.post("http://127.0.0.1:8000/task/", post)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['title'], ["This field may not be blank."])
-
 
     def test_task_post_task_blank(self):
         post = {
@@ -261,3 +265,39 @@ class TaskAPIViewTestCase(APITestCase):
         response = self.client.post("http://127.0.0.1:8000/task/", post)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['task'], ["Ensure this field has no more than 512 characters."])
+
+
+class AnswersAPIViewTestCase(APITestCase):
+    """ Tests for Answers View method """
+    fixtures = ['task-exam.json']
+
+    def setUp(self):
+        self.client.login(username='super-user', password='mkonjibhu')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_answers_get(self):
+        response = self.client.get("http://127.0.0.1:8000/answers/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_answers_valid(self):
+        post = {
+            'student': self.client,
+            'answers': 'test_answers',
+            'test': 1
+        }
+
+        response = self.client.post("http://127.0.0.1:8000/answers/", post)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['answers'], 'test_answers')
+
+    def test_answers_invalid(self):
+        post = {
+            'student': self.client,
+            'answers': '1' * 1025,
+            'test': 1
+        }
+        response = self.client.post("http://127.0.0.1:8000/answers/", post)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['answers'], ['Ensure this field has no more than 1024 characters.'])

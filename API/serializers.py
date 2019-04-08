@@ -26,6 +26,7 @@ class ExamSerializer(serializers.HyperlinkedModelSerializer):
 
 class AnswersSerializer(serializers.HyperlinkedModelSerializer):
     student = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    test = serializers.PrimaryKeyRelatedField(queryset=API.models.Exam.objects.all())
 
     class Meta:
         model = API.models.Answers
