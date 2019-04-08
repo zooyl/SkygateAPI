@@ -1,7 +1,6 @@
 # API imports
 import API.serializers
 import API.models
-import API.permissions
 
 # Rest imports
 from rest_framework import filters
@@ -10,8 +9,7 @@ from rest_framework import viewsets
 
 
 class TaskViewSet(viewsets.ModelViewSet):
-    permission_classes = (API.permissions.TaskPermission,
-                          rest_framework.permissions.IsAdminUser)
+    permission_classes = (rest_framework.permissions.IsAdminUser,)
     serializer_class = API.serializers.TaskSerializer
     filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     search_fields = ('title', 'task', 'points')
@@ -23,8 +21,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
 
 class ExamViewSet(viewsets.ModelViewSet):
-    permission_classes = (API.permissions.ExamPermission,
-                          rest_framework.permissions.IsAdminUser)
+    permission_classes = (rest_framework.permissions.IsAdminUser,)
     serializer_class = API.serializers.ExamSerializer
     filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     search_fields = ('name', 'grade', 'comments')
