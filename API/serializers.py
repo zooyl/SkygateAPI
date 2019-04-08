@@ -8,6 +8,8 @@ from rest_framework import serializers
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
     points = serializers.IntegerField(default=0, min_value=0, max_value=100)
 
+    # exam = serializers.PrimaryKeyRelatedField(queryset=API.models.Exam.objects.filter())
+
     class Meta:
         model = API.models.Task
         fields = '__all__'

@@ -1,7 +1,7 @@
 # API imports
-from django.test import TestCase
 import API.models
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 # Rest imports
 from rest_framework.test import APIClient, APITestCase
@@ -90,9 +90,88 @@ class GetTest(APITestCase):
     def test_all_task_get(self):
         response = self.client.get("http://127.0.0.1:8000/task/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 14)
+        self.assertEqual(response.data['count'], 6)
 
     def test_all_exam_get(self):
         response = self.client.get("http://127.0.0.1:8000/exam/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 7)
+        self.assertEqual(response.data['count'], 3)
+
+
+class ExamAPIViewTestCase(APITestCase):
+    """ Tests for Exam View method """
+    fixtures = ['task-exam.json']
+
+    def setUp(self):
+        self.client.login(username='super-user', password='mkonjibhu')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_exam_post_valid(self):
+        post = {
+            'user': self.client,
+            'name': 'test_name',
+            'grade': 'A+',
+            'comments': 'good job'
+        }
+        response = self.client.post("http://127.0.0.1:8000/exam/", post)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_exam_post_grade_invalid(self):
+        post = {
+            'user': self.client,
+            'name': 'test_name',
+            'grade': 'too_many',
+            'comments': 'good job'
+        }
+        response = self.client.post("http://127.0.0.1:8000/exam/", post)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['grade'], ["Ensure this field has no more than 2 characters."])
+
+    def test_exam_post_name_blank(self):
+        post = {
+            'user': self.client,
+            'name': '',
+            'grade': 'too_many',
+            'comments': 'good job'
+        }
+        response = self.client.post("http://127.0.0.1:8000/exam/", post)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['name'], ["This field may not be blank."])
+
+    def test_exam_post_name_too_long(self):
+        post = {
+            'user': self.client,
+            'name': 'that_name_is_too_long_for_this_field',
+            'grade': 'too_many',
+            'comments': 'good job'
+        }
+        response = self.client.post("http://127.0.0.1:8000/exam/", post)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['name'], ["Ensure this field has no more than 32 characters."])
+
+    def test_exam_post_comment_too_long(self):
+        post = {
+            'user': self.client,
+            'name': 'test_name',
+            'grade': 'too_many',
+            'comments': 'that_comment_is_too_long_for_this_field' * 15
+        }
+        response = self.client.post("http://127.0.0.1:8000/exam/", post)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['comments'], ["Ensure this field has no more than 128 characters."])
+
+    # I don't know why it's not working properly
+    #
+    # def test_exam_put(self):
+    #     put = {
+    #         'name': 'put_test_name',
+    #     }
+    #     response = self.client.put("http://127.0.0.1:8000/exam/1", put, follow=True)
+    #     self.assertEqual(response.data['name'], 'put_test_name')
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #
+    # def test_exam_delete(self):
+    #     response = self.client.delete("http://127.0.0.1:8000/exam/1", follow=True)
+    #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
