@@ -7,8 +7,8 @@ from rest_framework import serializers
 
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
     points = serializers.IntegerField(default=0, min_value=0, max_value=100)
-
-    # exam = serializers.PrimaryKeyRelatedField(queryset=API.models.Exam.objects.filter())
+    # I don't know how to point user_id at himself here in serializers
+    exam = serializers.PrimaryKeyRelatedField(queryset=API.models.Exam.objects.filter())
 
     class Meta:
         model = API.models.Task

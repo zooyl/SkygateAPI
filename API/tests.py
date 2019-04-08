@@ -1,8 +1,3 @@
-# API imports
-import API.models
-from django.contrib.auth.models import User
-from django.urls import reverse
-
 # Rest imports
 from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
@@ -117,6 +112,7 @@ class ExamAPIViewTestCase(APITestCase):
         }
         response = self.client.post("http://127.0.0.1:8000/exam/", post)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['comments'], 'good job')
 
     def test_exam_post_grade_invalid(self):
         post = {
@@ -175,3 +171,93 @@ class ExamAPIViewTestCase(APITestCase):
     # def test_exam_delete(self):
     #     response = self.client.delete("http://127.0.0.1:8000/exam/1", follow=True)
     #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class TaskAPIViewTestCase(APITestCase):
+    """ Tests for Task View method """
+    fixtures = ['task-exam.json']
+
+    def setUp(self):
+        self.client.login(username='super-user', password='mkonjibhu')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_task_post_valid(self):
+        post = {
+            'points': 10,
+            'title': 'test_title',
+            'task': 'test_task',
+            'exam': 1
+        }
+        response = self.client.post("http://127.0.0.1:8000/task/", post, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['title'], 'test_title')
+
+    def test_task_post_points_invalid_101(self):
+        post = {
+            'points': 101,
+            'title': 'test_title',
+            'task': 'test_task',
+            'exam': 1
+        }
+        response = self.client.post("http://127.0.0.1:8000/task/", post, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['points'], ["Ensure this value is less than or equal to 100."])
+
+
+    def test_task_post_points_invalid_under_0(self):
+        post = {
+            'points': -1,
+            'title': 'test_title',
+            'task': 'test_task',
+            'exam': 1
+        }
+        response = self.client.post("http://127.0.0.1:8000/task/", post, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['points'], ["Ensure this value is greater than or equal to 0."])
+
+    def test_task_post_title_blank(self):
+        post = {
+            'points': 10,
+            'title': '',
+            'task': 'test_task',
+            'exam': 1
+        }
+        response = self.client.post("http://127.0.0.1:8000/task/", post)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['title'], ["This field may not be blank."])
+
+
+    def test_task_post_task_blank(self):
+        post = {
+            'points': 10,
+            'title': 'test_title',
+            'task': '',
+            'exam': 1
+        }
+        response = self.client.post("http://127.0.0.1:8000/task/", post)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['task'], ["This field may not be blank."])
+
+    def test_task_post_title_too_long(self):
+        post = {
+            'points': 10,
+            'title': 'test_title' * 50,
+            'task': 'test_task',
+            'exam': 1
+        }
+        response = self.client.post("http://127.0.0.1:8000/task/", post)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['title'], ["Ensure this field has no more than 64 characters."])
+
+    def test_task_post_task_too_long(self):
+        post = {
+            'points': 10,
+            'title': 'test_title',
+            'task': 'test_task' * 60,
+            'exam': 1
+        }
+        response = self.client.post("http://127.0.0.1:8000/task/", post)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['task'], ["Ensure this field has no more than 512 characters."])
