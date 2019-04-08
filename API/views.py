@@ -1,17 +1,49 @@
+# API imports
+import API.serializers
+import API.models
+import API.permissions
+
+# Rest imports
+from rest_framework import filters
+import rest_framework.permissions
 from rest_framework import viewsets
-from .serializers import TaskSerializer, ExamSerializer
-from .models import Exam, Task
-from .permissions import ExamPermission, TaskPermission
-from rest_framework.permissions import IsAuthenticated
 
 
 class TaskViewSet(viewsets.ModelViewSet):
-    permission_classes = (TaskPermission, IsAuthenticated)
-    queryset = Task.objects.all().order_by('-points', 'exam__name', 'task')
-    serializer_class = TaskSerializer
+    permission_classes = (API.permissions.TaskPermission,
+                          rest_framework.permissions.IsAdminUser)
+    serializer_class = API.serializers.TaskSerializer
+    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    search_fields = ('title', 'task', 'points')
+    ordering_fields = ('title', 'task', 'points')
+
+    def get_queryset(self):
+        user = self.request.user
+        return API.models.Task.objects.filter(exam__user_id=user.id)
 
 
 class ExamViewSet(viewsets.ModelViewSet):
-    permission_classes = (ExamPermission, IsAuthenticated)
-    queryset = Exam.objects.all().order_by('user', '-grade')
-    serializer_class = ExamSerializer
+    permission_classes = (API.permissions.ExamPermission,
+                          rest_framework.permissions.IsAdminUser)
+    serializer_class = API.serializers.ExamSerializer
+    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    search_fields = ('name', 'grade', 'comments')
+    ordering_fields = ('name', 'grade', 'comments')
+
+    def get_queryset(self):
+        user = self.request.user
+        return API.models.Exam.objects.filter(user_id=user.id)
+
+
+class AnswersViewSet(viewsets.ModelViewSet):
+    serializer_class = API.serializers.AnswersSerializer
+    queryset = API.models.Answers.objects.all()
+    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    search_fields = '__all__'
+    ordering_fields = '__all__'
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return API.models.Answers.objects.filter(test__user_id=user.id)
+        return API.models.Answers.objects.filter(student_id=user.id)

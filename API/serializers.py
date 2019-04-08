@@ -1,20 +1,18 @@
-from .models import Exam, Task
+# API imports
+import API.models
+
+# Rest imports
 from rest_framework import serializers
 
 
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Task
-        fields = '__all__'
+    points = serializers.IntegerField(default=0, min_value=0, max_value=100)
+    # I don't know how to point user_id at himself here in serializers
+    exam = serializers.PrimaryKeyRelatedField(queryset=API.models.Exam.objects.filter())
 
-    def validate(self, attrs):
-        """ Validation for task points (Limit is set to 100) and if field is blank """
-        try:
-            if attrs['points'] > 100:
-                raise serializers.ValidationError('Maximum value of points is 100')
-        except KeyError:
-            raise serializers.ValidationError('Points row can not be blank')
-        return attrs
+    class Meta:
+        model = API.models.Task
+        fields = '__all__'
 
 
 class ExamSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,5 +20,14 @@ class ExamSerializer(serializers.HyperlinkedModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
-        model = Exam
+        model = API.models.Exam
+        fields = '__all__'
+
+
+class AnswersSerializer(serializers.HyperlinkedModelSerializer):
+    student = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    test = serializers.PrimaryKeyRelatedField(queryset=API.models.Exam.objects.all())
+
+    class Meta:
+        model = API.models.Answers
         fields = '__all__'
